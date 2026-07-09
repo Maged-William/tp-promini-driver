@@ -34,9 +34,9 @@ static void trackpoint_i2c_poll_handler(struct k_work *work)
 		int8_t y = (int8_t)buf[1];
 
 		if (x != 0 || y != 0) {
-			input_report_rel(data->dev, INPUT_REL_X, x, false, true);
-			input_report_rel(data->dev, INPUT_REL_Y, y, false, true);
-			input_sync(data->dev);
+			input_report_rel(data->dev, INPUT_REL_X, x, false);
+			input_report_rel(data->dev, INPUT_REL_Y, y, false);
+			input_sync(data->dev, false);
 		}
 	}
 
