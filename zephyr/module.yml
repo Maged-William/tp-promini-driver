@@ -1,0 +1,7 @@
+name: zmk-driver-trackpoint-i2c
+build:
+  settings:
+    board_root: .
+    dts_root: .
+  cmake: src/
+  kconfig: Kconfig

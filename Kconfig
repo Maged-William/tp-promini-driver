@@ -1,0 +1,7 @@
+config TRACKPOINT_I2C
+    bool "I2C TrackPoint driver"
+    default y
+    depends on I2C
+    help
+      Driver for reading TrackPoint X/Y data via I2C from a Pro Mini
+      configured as an I2C slave.

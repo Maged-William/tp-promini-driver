@@ -1,0 +1,24 @@
+/ {
+    chosen {
+        zmk,kscan = &mock_kscan;
+    };
+
+    mock_kscan: mock_kscan_0 {
+        compatible = "zmk,kscan-mock";
+    };
+};
+
+&pro_micro_i2c {
+    status = "okay";
+    trackpoint: trackpoint@42 {
+        compatible = "trackpoint,i2c";
+        reg = <0x42>;
+    };
+};
+
+/ {
+    trackpoint_listener {
+        compatible = "zmk,input-listener";
+        device = <&trackpoint>;
+    };
+};

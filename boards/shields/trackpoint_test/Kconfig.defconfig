@@ -1,0 +1,12 @@
+if SHIELD_TRACKPOINT_TEST
+
+config ZMK_KEYBOARD_NAME
+    default "TP Test"
+
+config ZMK_POINTING
+    default y
+
+config I2C
+    default y
+
+endif

@@ -1,0 +1,13 @@
+description: TrackPoint over I2C from Pro Mini slave
+
+compatible: "trackpoint,i2c"
+
+properties:
+  reg:
+    required: true
+    description: I2C address of the Pro Mini slave
+
+  poll-rate-ms:
+    type: int
+    default: 10
+    description: Polling interval in milliseconds
