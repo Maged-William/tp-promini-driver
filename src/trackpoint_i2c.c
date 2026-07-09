@@ -29,13 +29,20 @@ static void trackpoint_i2c_poll_handler(struct k_work *work)
 	int ret;
 
 	ret = i2c_read(cfg->i2c_bus, buf, sizeof(buf), cfg->i2c_addr);
-	if (ret == 0) {
+	if (ret != 0) {
+		LOG_WRN("I2C read failed: %d", ret);
+	} else {
 		int8_t x = (int8_t)buf[0];
 		int8_t y = (int8_t)buf[1];
 
+		LOG_DBG("X=%d Y=%d", x, y);
+
 		if (x != 0 || y != 0) {
-			input_report_rel(data->dev, INPUT_REL_X, x, true, K_NO_WAIT);
-			input_report_rel(data->dev, INPUT_REL_Y, y, true, K_NO_WAIT);
+			input_report_rel(data->dev, INPUT_REL_X, x,
+					 false, K_NO_WAIT);
+			input_report_rel(data->dev, INPUT_REL_Y, y,
+					 false, K_NO_WAIT);
+			input_sync(data->dev, K_NO_WAIT);
 		}
 	}
 
