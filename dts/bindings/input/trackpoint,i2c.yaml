@@ -2,10 +2,10 @@ description: TrackPoint over I2C from Pro Mini slave
 
 compatible: "trackpoint,i2c"
 
+include: i2c-device.yaml
+
 properties:
-  reg:
-    required: true
-    description: I2C address of the Pro Mini slave
+  poll-rate-ms:
 
   poll-rate-ms:
     type: int
