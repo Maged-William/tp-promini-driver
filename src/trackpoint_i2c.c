@@ -23,7 +23,7 @@ struct trackpoint_i2c_data {
 static int trackpoint_i2c_probe(const struct device *i2c_bus, uint16_t addr)
 {
 	uint8_t dummy;
-	return i2c_write_read(i2c_bus, addr, NULL, 0, &dummy, 0);
+	return i2c_read(i2c_bus, &dummy, 1, addr);
 }
 
 static void trackpoint_i2c_poll_handler(struct k_work *work)
