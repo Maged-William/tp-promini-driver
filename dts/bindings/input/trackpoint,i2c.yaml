@@ -6,8 +6,10 @@ include: i2c-device.yaml
 
 properties:
   poll-rate-ms:
-
-  poll-rate-ms:
     type: int
     default: 10
     description: Polling interval in milliseconds
+
+  probe-addr:
+    type: int
+    description: Alternative I2C address to probe if the primary reg address fails
