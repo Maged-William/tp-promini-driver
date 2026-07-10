@@ -80,13 +80,6 @@ static int trackpoint_i2c_init(const struct device *dev)
 		return ret;
 	}
 
-	ret = gpio_pin_interrupt_configure_dt(&cfg->dr,
-					      GPIO_INT_EDGE_FALLING);
-	if (ret < 0) {
-		LOG_ERR("Failed to configure DR interrupt: %d", ret);
-		return ret;
-	}
-
 	gpio_init_callback(&data->gpio_cb, trackpoint_i2c_gpio_cb,
 			   BIT(cfg->dr.pin));
 	ret = gpio_add_callback(cfg->dr.port, &data->gpio_cb);
@@ -95,9 +88,10 @@ static int trackpoint_i2c_init(const struct device *dev)
 		return ret;
 	}
 
-	if (gpio_pin_get_dt(&cfg->dr) == 0) {
-		LOG_DBG("DR already asserted, submitting initial work");
-		k_work_submit(&data->work);
+	ret = gpio_pin_interrupt_configure_dt(&cfg->dr,
+					      GPIO_INT_EDGE_FALLING);
+	if (ret < 0) {
+		LOG_WRN("DR interrupt unavailable, poll fallback: %d", ret);
 	}
 
 	LOG_INF("TrackPoint I2C initialized at addr 0x%02x",
