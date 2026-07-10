@@ -40,6 +40,7 @@
         compatible = "trackpoint,spi";
         reg = <0>;
         spi-max-frequency = <1000000>;
+        swap-xy;
     };
 };
 

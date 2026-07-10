@@ -9,3 +9,15 @@ properties:
     type: int
     default: 10
     description: Polling interval in milliseconds
+
+  swap-xy:
+    type: boolean
+    description: Swap X and Y axes
+
+  invert-x:
+    type: boolean
+    description: Invert X axis direction
+
+  invert-y:
+    type: boolean
+    description: Invert Y axis direction
