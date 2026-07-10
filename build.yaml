@@ -1,3 +1,5 @@
 include:
   - board: nice_nano//zmk
     shield: trackpoint_test
+  - board: nice_nano//zmk
+    shield: spi_test

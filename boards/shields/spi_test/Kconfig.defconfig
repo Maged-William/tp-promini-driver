@@ -1,0 +1,15 @@
+if SHIELD_SPI_TEST
+
+config ZMK_KEYBOARD_NAME
+    default "SPI TP Test"
+
+config ZMK_POINTING
+    default y
+
+config INPUT
+    default y
+
+config SPI
+    default y
+
+endif

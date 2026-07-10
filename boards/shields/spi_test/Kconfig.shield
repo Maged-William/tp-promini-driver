@@ -1,0 +1,2 @@
+config SHIELD_SPI_TEST
+    def_bool $(shields_list_contains,spi_test)

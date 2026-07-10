@@ -5,3 +5,11 @@ config TRACKPOINT_I2C
     help
       Driver for reading TrackPoint X/Y data via I2C from a Pro Mini
       configured as an I2C slave.
+
+config TRACKPOINT_SPI
+    bool "SPI TrackPoint driver"
+    default y
+    depends on SPI
+    help
+      Driver for reading TrackPoint X/Y data via SPI from a Pro Mini
+      configured as an SPI slave.

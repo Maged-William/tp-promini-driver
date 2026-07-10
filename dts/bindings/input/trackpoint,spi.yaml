@@ -1,0 +1,11 @@
+description: TrackPoint over SPI from Pro Mini slave
+
+compatible: "trackpoint,spi"
+
+include: spi-device.yaml
+
+properties:
+  report-rate-ms:
+    type: int
+    default: 10
+    description: Polling interval in milliseconds
