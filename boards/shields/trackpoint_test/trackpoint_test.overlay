@@ -16,6 +16,7 @@
     trackpoint: trackpoint@42 {
         compatible = "trackpoint,i2c";
         reg = <0x42>;
+        dr-gpios = <&gpio0 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
     };
 };
 
