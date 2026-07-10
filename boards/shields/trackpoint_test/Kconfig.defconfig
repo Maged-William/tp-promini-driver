@@ -12,4 +12,10 @@ config INPUT
 config I2C
     default y
 
+config LOG
+    default y
+
+config INPUT_LOG_LEVEL
+    default 4
+
 endif
