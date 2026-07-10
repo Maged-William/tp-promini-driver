@@ -12,9 +12,6 @@ config INPUT
 config I2C
     default y
 
-config GPIO
-    default y
-
 config LOG
     default y
 

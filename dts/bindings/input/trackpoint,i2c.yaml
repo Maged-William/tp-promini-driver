@@ -5,8 +5,7 @@ compatible: "trackpoint,i2c"
 include: i2c-device.yaml
 
 properties:
-  dr-gpios:
-    type: phandle-array
-    required: true
-    description:
-      Data-ready GPIO pin (active low). Connected to Pro Mini pin 9.
+  poll-rate-ms:
+    type: int
+    default: 10
+    description: Polling interval in milliseconds
