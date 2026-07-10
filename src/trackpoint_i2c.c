@@ -48,8 +48,6 @@ static void trackpoint_i2c_poll_handler(struct k_work *work)
 			input_report_rel(data->dev, INPUT_REL_X, x,
 					 false, K_NO_WAIT);
 			input_report_rel(data->dev, INPUT_REL_Y, y,
-					 false, K_NO_WAIT);
-			input_report_rel(data->dev, INPUT_REL_Z, 0,
 					 true, K_NO_WAIT);
 		}
 	}
