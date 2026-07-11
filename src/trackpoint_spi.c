@@ -28,13 +28,13 @@ static int trackpoint_spi_read_xy(const struct device *dev,
 				  int8_t *x, int8_t *y)
 {
 	const struct trackpoint_spi_config *cfg = dev->config;
-	uint8_t dummy = 0;
-	uint8_t rx_x, rx_y;
+	uint8_t tx[2] = { 0, 0 };
+	uint8_t rx[2];
 	int ret;
 
-	const struct spi_buf tx_buf = { .buf = &dummy, .len = 1 };
+	const struct spi_buf tx_buf = { .buf = tx, .len = sizeof(tx) };
 	const struct spi_buf_set tx_set = { .buffers = &tx_buf, .count = 1 };
-	struct spi_buf rx_buf = { .buf = &rx_x, .len = 1 };
+	struct spi_buf rx_buf = { .buf = rx, .len = sizeof(rx) };
 	const struct spi_buf_set rx_set = { .buffers = &rx_buf, .count = 1 };
 
 	ret = spi_transceive_dt(&cfg->bus, &tx_set, &rx_set);
@@ -42,14 +42,8 @@ static int trackpoint_spi_read_xy(const struct device *dev,
 		return ret;
 	}
 
-	rx_buf.buf = &rx_y;
-	ret = spi_transceive_dt(&cfg->bus, &tx_set, &rx_set);
-	if (ret != 0) {
-		return ret;
-	}
-
-	*x = (int8_t)rx_x;
-	*y = (int8_t)rx_y;
+	*x = (int8_t)rx[0];
+	*y = (int8_t)rx[1];
 	return 0;
 }
 
