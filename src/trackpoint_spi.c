@@ -77,6 +77,8 @@ static void trackpoint_spi_poll_handler(struct k_work *work)
 	if (cfg->inv_x) x = -x;
 	if (cfg->inv_y) y = -y;
 
+	LOG_DBG("raw: x=%d y=%d  mapped: x=%d y=%d", x_raw, y_raw, x, y);
+
 	if (x != 0 || y != 0) {
 		data->dx += x;
 		data->dy += y;
