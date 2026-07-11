@@ -3,6 +3,7 @@
 #include <zephyr/drivers/spi.h>
 #include <zephyr/input/input.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/util.h>
 
 LOG_MODULE_REGISTER(trackpoint_spi, CONFIG_INPUT_LOG_LEVEL);
 
@@ -23,36 +24,33 @@ struct trackpoint_spi_data {
 	struct k_work_delayable poll_work;
 };
 
-static int trackpoint_spi_read_reg(const struct device *dev,
-				   uint8_t reg, int8_t *out)
-{
-	const struct trackpoint_spi_config *cfg = dev->config;
-	uint8_t tx = reg;
-	uint8_t rx;
-
-	const struct spi_buf tx_buf = { .buf = &tx, .len = 1 };
-	const struct spi_buf_set tx_set = { .buffers = &tx_buf, .count = 1 };
-	struct spi_buf rx_buf = { .buf = &rx, .len = 1 };
-	const struct spi_buf_set rx_set = { .buffers = &rx_buf, .count = 1 };
-
-	int ret = spi_transceive_dt(&cfg->bus, &tx_set, &rx_set);
-	if (ret == 0) {
-		*out = (int8_t)rx;
-	}
-	return ret;
-}
-
 static int trackpoint_spi_read_xy(const struct device *dev,
 				  int8_t *x, int8_t *y)
 {
+	const struct trackpoint_spi_config *cfg = dev->config;
+	uint8_t dummy = 0;
+	uint8_t rx_x, rx_y;
 	int ret;
 
-	ret = trackpoint_spi_read_reg(dev, 0x00, x);
+	const struct spi_buf tx_buf = { .buf = &dummy, .len = 1 };
+	const struct spi_buf_set tx_set = { .buffers = &tx_buf, .count = 1 };
+	struct spi_buf rx_buf = { .buf = &rx_x, .len = 1 };
+	const struct spi_buf_set rx_set = { .buffers = &rx_buf, .count = 1 };
+
+	ret = spi_transceive_dt(&cfg->bus, &tx_set, &rx_set);
 	if (ret != 0) {
 		return ret;
 	}
 
-	return trackpoint_spi_read_reg(dev, 0x01, y);
+	rx_buf.buf = &rx_y;
+	ret = spi_transceive_dt(&cfg->bus, &tx_set, &rx_set);
+	if (ret != 0) {
+		return ret;
+	}
+
+	*x = (int8_t)rx_x;
+	*y = (int8_t)rx_y;
+	return 0;
 }
 
 static void trackpoint_spi_poll_handler(struct k_work *work)
@@ -65,33 +63,32 @@ static void trackpoint_spi_poll_handler(struct k_work *work)
 
 	if (trackpoint_spi_read_xy(data->dev, &x_raw, &y_raw) != 0) {
 		LOG_WRN("SPI read failed");
+		return;
+	}
+
+	if (cfg->swap_xy) {
+		x = y_raw;
+		y = x_raw;
 	} else {
-		if (cfg->swap_xy) {
-			x = y_raw;
-			y = x_raw;
-		} else {
-			x = x_raw;
-			y = y_raw;
-		}
+		x = x_raw;
+		y = y_raw;
+	}
 
-		if (cfg->inv_x) x = -x;
-		if (cfg->inv_y) y = -y;
+	if (cfg->inv_x) x = -x;
+	if (cfg->inv_y) y = -y;
 
+	if (x != 0 || y != 0) {
 		data->dx += x;
 		data->dy += y;
 
-		int16_t rx = (int16_t)CLAMP(data->dx, INT16_MIN, INT16_MAX);
-		int16_t ry = (int16_t)CLAMP(data->dy, INT16_MIN, INT16_MAX);
+		int16_t rx = CLAMP(data->dx, INT16_MIN, INT16_MAX);
+		int16_t ry = CLAMP(data->dy, INT16_MIN, INT16_MAX);
 
-		if (rx != 0 || ry != 0) {
-			data->dx = 0;
-			data->dy = 0;
+		data->dx = 0;
+		data->dy = 0;
 
-			input_report_rel(data->dev, INPUT_REL_X, rx,
-					 false, K_NO_WAIT);
-			input_report_rel(data->dev, INPUT_REL_Y, ry,
-					 true, K_NO_WAIT);
-		}
+		input_report_rel(data->dev, INPUT_REL_X, rx, false, K_NO_WAIT);
+		input_report_rel(data->dev, INPUT_REL_Y, ry, true, K_NO_WAIT);
 	}
 
 	k_work_schedule(dwork, K_MSEC(cfg->report_ms));
@@ -114,8 +111,8 @@ static int trackpoint_spi_init(const struct device *dev)
 	k_work_init_delayable(&data->poll_work, trackpoint_spi_poll_handler);
 	k_work_schedule(&data->poll_work, K_MSEC(cfg->report_ms));
 
-	LOG_INF("TrackPoint SPI initialized, swap_xy=%d inv_x=%d inv_y=%d",
-		cfg->swap_xy, cfg->inv_x, cfg->inv_y);
+	LOG_INF("TrackPoint SPI initialized (report=%dms swap=%d inv_x=%d inv_y=%d)",
+		cfg->report_ms, cfg->swap_xy, cfg->inv_x, cfg->inv_y);
 	return 0;
 }
 

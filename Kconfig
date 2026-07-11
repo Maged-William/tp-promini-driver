@@ -9,7 +9,9 @@ config TRACKPOINT_I2C
 config TRACKPOINT_SPI
     bool "SPI TrackPoint driver"
     default y
-    depends on SPI
+    select SPI
+    depends on INPUT
+    depends on DT_HAS_TRACKPOINT_SPI_ENABLED
     help
       Driver for reading TrackPoint X/Y data via SPI from a Pro Mini
       configured as an SPI slave.
